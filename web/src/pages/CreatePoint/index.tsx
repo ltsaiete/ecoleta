@@ -17,19 +17,20 @@ interface Item {
     image_url: string;
 }
 
-interface IBGEUFResponse {
-    sigla: string;
+interface MozAPIProvinceResponse {
+    id: number;
+    name: string;
 }
 
-interface IBGECityResponse {
-    nome: string;
+interface MozAPICityResponse {
+    name: string;
 }
 
 
 const CreatePoint = () => {
 
     const [items, setItems] = useState<Item[]>([]);
-    const [ufs, setUfs] = useState<string[]>([]);
+    const [provinces, setProvinces] = useState<MozAPIProvinceResponse[]>([]);
     const [cities, setCities] = useState<string[]>([]);
 
     const [initialPosition, setInitialPosition] = useState<[number, number]>([0, 0]);
@@ -40,11 +41,13 @@ const CreatePoint = () => {
         whatsapp: '',
     })
 
-    const [selectedUf, setSelectedUf] = useState('0');
+    const [selectedProvince, setSelectedProvince] = useState('0');
     const [selectedCity, setSelectedCity] = useState('0');
     const [selectedItems, setSelectedItems] = useState<number[]>([]);
     const [selectedPosition, setSelectedPosition] = useState<[number, number]>([0, 0]);
     const [selectedFile, setSelectedFile] = useState<File>();
+
+    const [provinceName, setProvinceName] = useState<string>('aaaaa')
 
     const history = useHistory();
 
@@ -62,30 +65,48 @@ const CreatePoint = () => {
     }, []);
 
     useEffect(() => {
-        axios.get<IBGEUFResponse[]>('https://servicodados.ibge.gov.br/api/v1/localidades/estados')
+        axios.get<MozAPIProvinceResponse[]>('http://localhost:4000/provinces')
             .then(response => {
-                const ufInitials = response.data.map(uf => uf.sigla);
-                setUfs(ufInitials);
+                const provinceData = response.data
+                    .map(province => {
+                        return {
+                            id: province.id,
+                            name: province.name
+                        }
+                    });
+                    console.log(provinceData)
+
+                setProvinces(provinceData);
+
             });
     }, []);
 
     useEffect(() => {
-        if (selectedUf === '0') {
+        if (selectedProvince === '0') {
             return;
         }
 
         axios
-            .get<IBGECityResponse[]>(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedUf}/municipios`)
+            .get<MozAPICityResponse[]>(`http://localhost:4000/${selectedProvince}/districts`)
             .then(response => {
-                const cityNames = response.data.map(uf => uf.nome);
+                const cityNames = response.data.map(province => province.name);
                 setCities(cityNames);
             });
 
-    }, [selectedUf]);
+    }, [selectedProvince]);
 
-    function handleSelectedUf(event: ChangeEvent<HTMLSelectElement>) {
-        const uf = event.target.value;
-        setSelectedUf(uf);
+
+    useEffect(() => {
+        axios
+            .get<MozAPIProvinceResponse>(`http://localhost:4000/provinces/${selectedProvince}`)
+            .then(response => {
+                setProvinceName(response.data.name);
+            });
+    }, [selectedProvince])
+
+    function handleSelectedProvince(event: ChangeEvent<HTMLSelectElement>) {
+        const province = event.target.value;
+        setSelectedProvince(province);
     }
     function handleSelectedCity(event: ChangeEvent<HTMLSelectElement>) {
         const city = event.target.value;
@@ -124,7 +145,7 @@ const CreatePoint = () => {
         event.preventDefault();
 
         const { name, email, whatsapp } = formData;
-        const uf = selectedUf;
+        const province = provinceName;
         const city = selectedCity;
         const [latitude, longitude] = selectedPosition;
         const items = selectedItems;
@@ -132,18 +153,18 @@ const CreatePoint = () => {
         const data = new FormData();
 
 
-data.append('name', name);
-data.append('email', email);
-data.append('whatsapp', whatsapp);
-data.append('uf', uf);
-data.append('city', city);
-data.append('latitude', String(latitude));
-data.append('longitude', String(longitude));
-data.append('items', items.join(','));
+        data.append('name', name);
+        data.append('email', email);
+        data.append('whatsapp', whatsapp);
+        data.append('province', province);
+        data.append('city', city);
+        data.append('latitude', String(latitude));
+        data.append('longitude', String(longitude));
+        data.append('items', items.join(','));
 
-if(selectedFile) {
-    data.append('image', selectedFile);
-}
+        if (selectedFile) {
+            data.append('image', selectedFile);
+        }
 
 
         await api.post('points', data);
@@ -224,17 +245,17 @@ if(selectedFile) {
 
                     <div className="field-group">
                         <div className="field">
-                            <label htmlFor="uf">Estado(UF)</label>
+                            <label htmlFor="province">Província</label>
                             <select
-                                name="uf"
-                                id="uf"
-                                value={selectedUf}
-                                onChange={handleSelectedUf}
+                                name="province"
+                                id="province"
+                                value={selectedProvince}
+                                onChange={handleSelectedProvince}
                             >
-                                <option value="0">Selecione uma UF</option>
+                                <option value="0">Selecione uma Província</option>
                                 {
-                                    ufs.map(uf => (
-                                        <option key={uf} value={uf}>{uf}</option>
+                                    provinces.map(province => (
+                                        <option key={province.id} value={province.id}>{province.name}</option>
                                     ))
                                 }
                             </select>
