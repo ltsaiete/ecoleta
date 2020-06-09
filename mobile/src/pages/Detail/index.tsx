@@ -20,7 +20,7 @@ interface Data {
         email: string;
         whatsapp: string;
         city: string;
-        uf: string;
+        province: string;
     };
     items: {
         title: string;
@@ -85,7 +85,7 @@ const Detail = () => {
 
                 <View style={styles.address} >
                     <Text style={styles.addressTitle} >Endereço</Text>
-                    <Text style={styles.addressContent} >{data.point.city}, {data.point.uf}</Text>
+                    <Text style={styles.addressContent} >{data.point.city}, {data.point.province}</Text>
 
                 </View>
 
