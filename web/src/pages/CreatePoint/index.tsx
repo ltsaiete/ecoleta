@@ -47,7 +47,7 @@ const CreatePoint = () => {
     const [selectedPosition, setSelectedPosition] = useState<[number, number]>([0, 0]);
     const [selectedFile, setSelectedFile] = useState<File>();
 
-    const [provinceName, setProvinceName] = useState<string>('aaaaa')
+    const [provinceName, setProvinceName] = useState<string>('')
 
     const history = useHistory();
 

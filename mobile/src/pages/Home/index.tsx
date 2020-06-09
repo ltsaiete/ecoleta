@@ -1,21 +1,73 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Feather as Icon } from '@expo/vector-icons';
-import { View, Image, StyleSheet, Text, ImageBackground, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Image, StyleSheet, Text, ImageBackground, TextInput, KeyboardAvoidingView, Picker } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native';
+import RNPickerSelect from 'react-native-picker-select';
 
+import mozApi from '../../services/mozApi';
+
+
+interface MozAPIProvinceResponse {
+  id: number;
+  name: string;
+}
+
+interface MozAPICityResponse {
+  name: string;
+}
 
 const Home = () => {
 
-  const [uf, setUf] = useState('');
-  const [city, setCity] = useState('');
+  const [provinces, setProvinces] = useState<MozAPIProvinceResponse[]>([]);
+  const [cities, setCities] = useState<string[]>([]);
+
+  const [provinceName, setProvinceName] = useState<string>('')
+
+  const [selectedProvince, setSelectedProvince] = useState('0');
+  const [selectedCity, setSelectedCity] = useState('');
 
   const navigation = useNavigation();
 
+  useEffect(() => {
+    mozApi.get<MozAPIProvinceResponse[]>('/provinces')
+      .then(response => {
+        const provinceData = response.data
+          .map(province => {
+            return {
+              id: province.id,
+              name: province.name
+            }
+          });
+
+        setProvinces(provinceData);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (selectedProvince === '0') {
+        return;
+    }
+        mozApi.get<MozAPICityResponse[]>(`/${selectedProvince}/districts`)
+        .then(response => {
+            const cityNames = response.data.map(province => province.name);
+            setCities(cityNames);
+        });
+
+}, [selectedProvince]);
+
+useEffect(() => {
+  mozApi.get<MozAPIProvinceResponse>(`/provinces/${selectedProvince}`)
+      .then(response => {
+          setProvinceName(response.data.name);
+      });
+}, [selectedProvince])
+
   function handleNavigateToPoints() {
     navigation.navigate('Points', {
-      uf,
-      city
+      provinceName,
+      selectedCity
     });
   }
 
@@ -29,31 +81,46 @@ const Home = () => {
         <View style={styles.main} >
 
           <Image source={require('../../assets/logo.png')} />
-          
-            <Text style={styles.title}>Seu marketplace de coleta de resíduos</Text>
-            <Text style={styles.description}>Ajudamos pessoas a encontrarem pontos de coleta de forma eficiente.</Text>
-          
+
+          <Text style={styles.title}>Seu marketplace de coleta de resíduos</Text>
+          <Text style={styles.description}>Ajudamos pessoas a encontrarem pontos de coleta de forma eficiente.</Text>
+
 
         </View>
 
         <View style={styles.footer} >
+          <View style={styles.input}>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Digite a UF"
-            value={uf}
-            maxLength={2}
-            autoCapitalize="characters"
-            autoCorrect={false}
-            onChangeText={setUf}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Digite a Cidade"
-            value={city}
-            autoCorrect={false}
-            onChangeText={setCity}
-          />
+            <RNPickerSelect
+              placeholder={{ label: 'Selecione a província' }}
+              onValueChange={(value) => setSelectedProvince(value)}
+              items={
+                provinces.map(province => {
+                  return {
+                    label: province.name,
+                    value: province.id
+                  }
+                })
+              }
+            />
+          </View>
+
+          <View style={styles.input}>
+
+            <RNPickerSelect
+              placeholder={{ label: 'Selecione a Cidade' }}
+              onValueChange={(value) => setSelectedCity(value)}
+              items={
+                cities.map(city => {
+                  return {
+                    label: city,
+                    value: city
+                  }
+                })
+
+              }
+            />
+          </View>
 
 
           <RectButton style={styles.button} onPress={handleNavigateToPoints} >
