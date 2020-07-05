@@ -13,7 +13,6 @@ const upload = multer(multerConfig);
 const pointsController = new PointsController();
 const itemsController = new ItemsController();
 
-
 routes.get('/items', itemsController.index);
 
 routes.get('/points', pointsController.index);

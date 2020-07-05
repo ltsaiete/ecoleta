@@ -39,7 +39,7 @@ const CreatePoint = () => {
         name: '',
         email: '',
         whatsapp: '',
-    })
+    });
 
     const [selectedProvince, setSelectedProvince] = useState('0');
     const [selectedCity, setSelectedCity] = useState('0');
@@ -74,8 +74,6 @@ const CreatePoint = () => {
                             name: province.name
                         }
                     });
-                    console.log(provinceData)
-
                 setProvinces(provinceData);
 
             });
@@ -152,7 +150,6 @@ const CreatePoint = () => {
 
         const data = new FormData();
 
-
         data.append('name', name);
         data.append('email', email);
         data.append('whatsapp', whatsapp);
@@ -165,7 +162,6 @@ const CreatePoint = () => {
         if (selectedFile) {
             data.append('image', selectedFile);
         }
-
 
         await api.post('points', data);
         alert('ponto de coleta criado');
