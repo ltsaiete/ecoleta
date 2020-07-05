@@ -4,8 +4,8 @@
 <p align="center"><b>
 Next Level Week 1.0:rocket:
 </b></p>
-<p align="center" ><a href="">Projecto</a> |
-<a href="">Next Level Week</a> | <a href="">Tecnologias</a> | <a href="">Como contribuir</a> | <a href="">Licença</a></p>
+<p align="center" ><a href="#projecto">Projecto</a> |
+<a href="#next-level-week">Next Level Week</a> | <a href="#tecnologias">Tecnologias</a> | <a href="#como-contribuir">Como contribuir</a> | <a href="#memo-licença">Licença</a></p>
 
 ## Projecto
 O Ecoleta é uma app que conecta entidades que fazem colecta de resíduos sólidos à pessoas que pretendem fazer reciclagem.
