@@ -13,7 +13,7 @@ O Ecoleta é uma app que conecta entidades que fazem colecta de resíduos sólid
 ## Next Level Week
 A **Next Level Week** é um evento 100% online promovido pela [Rocketseat](https://rocketseat.com.br) que visa levar as habilidades dos devs para o próximo nível, onde durante uma semana desenvolvemos uma app para explorar diversos conceitos e aprender muito sobre esta stack altamente poderosa que é o JavaScript.
 
-#Tecnologias
+# Tecnologias
 Este projecto foi desenvolvido com as seguintes tecnologias:
 * TypeScript
 * Node.js
